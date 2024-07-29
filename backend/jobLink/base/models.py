@@ -1,5 +1,4 @@
 from django.db import models
-from django.db import models
 from django.contrib.auth.models import AbstractUser, PermissionsMixin
 from django.utils.translation import gettext_lazy as _
 from .managers import CustomUserManager
@@ -12,53 +11,107 @@ class User(AbstractUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
     date_joined = models.DateTimeField(auto_now_add=True)
-
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["first_name", "last_name"]
-
     objects = CustomUserManager()
-
     class Meta:
-        
         verbose_name = _("User")
         verbose_name_plural = _("Users")
-    
     def __str__(self):
         return self.email
-    
     @property
     def get_full_name(self):
         return f"{self.first_name} {self.last_name}"
 
 
+class Category(models.Model):
+    title = models.CharField(max_length=255)
+    description = models.TextField()
+    date_posted = models.DateTimeField(auto_now_add=True)
+    image = models.ImageField(upload_to='category_images/', blank=True)
+    _id = models.AutoField(primary_key=True, editable=False)
+
+    def __str__(self):
+        return self.title
+
 class Worker(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    categories = models.ManyToManyField(Category, related_name='workers')
+    rating = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
+    numReviews = models.IntegerField(null=True, blank=True, default=0)
+    pricePerHour = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
+    gender_choices = [
+        ('M', 'Male'),
+        ('F', 'Female'),
+    ]
+    gender = models.CharField(max_length=1, choices=gender_choices)
+    profile_photo = models.ImageField(upload_to='profile_photos/', null=True, blank=True)
     num_tel = models.CharField(max_length=20)
-    skills = models.TextField()
-    rating = models.FloatField(default=0.0)
-    reviews = models.TextField(blank=True, null=True)
-    comments = models.TextField(blank=True, null=True)
-
-    numReviews = models.IntegerField(null=True,blank=True,default=0)
-    price = models.DecimalField(max_digits=12,decimal_places=2,null=True,blank=True)
-    _id = models.AutoField(primary_key=True,editable=False)
-
-
+    small_description = models.TextField(null=True, blank=True)
+    description = models.TextField(null=True, blank=True)
+    _id = models.AutoField(primary_key=True, editable=False)
     def __str__(self):
         return f"{self.user.email} - {self.num_tel}"
 
+class ExtraImage(models.Model):
+    image = models.ImageField(upload_to='extra_images/')
+    worker = models.ForeignKey(Worker, related_name='extra_images', on_delete=models.CASCADE)
 
-class Category(models.Model):
-    Worker = models.ForeignKey(Worker, on_delete=models.CASCADE)
+    def __str__(self):
+        return f"Image {self.id} for {self.worker.user.email}"
+
+class Language(models.Model):
+    name = models.CharField(max_length=50)
+    worker = models.ForeignKey(Worker, related_name='languages', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.name
+
+class Education(models.Model):
     title = models.CharField(max_length=255)
-    description = models.TextField()
-    smallDesc = models.TextField()
-    location = models.CharField(max_length=255)
-    payment = models.DecimalField(max_digits=10, decimal_places=2)
-    date_posted = models.DateTimeField(auto_now_add=True)
-    _id = models.AutoField(primary_key=True,editable=False)
+    institution = models.CharField(max_length=255)
+    year_completed = models.IntegerField()
+    worker = models.ForeignKey(Worker, related_name='educations', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.title
+
+class Certificate(models.Model):
+    title = models.CharField(max_length=255)
+    issued_by = models.CharField(max_length=255)
+    date_issued = models.DateField()
+    worker = models.ForeignKey(Worker, related_name='certificates', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.title
+    
+
+class Review(models.Model):
+    reviewer = models.ForeignKey(User, on_delete=models.SET_NULL,null=True, related_name='reviewer')
+    worker = models.ForeignKey(Worker, on_delete=models.CASCADE)
+    # job = models.ForeignKey(Job, on_delete=models.CASCADE)
+    rating =  models.IntegerField(null=True,blank=True,default=0)
+    comment = models.TextField(null=True,blank=True)
+    createdAt = models.DateTimeField(auto_now_add=True)
+    _id =  models.AutoField(primary_key=True,editable=False)
 
 
+
+    def __str__(self):
+        return str(self.rating)
+
+
+# class Review(models.Model):
+#     # product = models.ForeignKey(Product,on_delete=models.SET_NULL,null=True)
+#     # user = models.ForeignKey(User,on_delete=models.SET_NULL,null=True)
+#     # name = models.CharField(max_length=200,null=True,blank=True)
+#     # rating =  models.IntegerField(null=True,blank=True,default=0)
+#     # comment = models.TextField(null=True,blank=True)
+#     # createdAt = models.DateTimeField(auto_now_add=True)
+#     # _id =  models.AutoField(primary_key=True,editable=False)
+
+#     def __str__(self):
+#         return str(self.rating)
 # class EmployerProfile(models.Model):
 #     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
 #     company_name = models.CharField(max_length=255)
@@ -85,15 +138,6 @@ class Category(models.Model):
 #     def __str__(self):
 #         return f"Application by {self.worker.user.username} for {self.job.title}"
 
-# class Review(models.Model):
-#     reviewer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reviewer')
-#     worker = models.ForeignKey(WorkerProfile, on_delete=models.CASCADE)
-#     job = models.ForeignKey(Job, on_delete=models.CASCADE)
-#     rating = models.IntegerField()
-#     comments = models.TextField()
-
-#     def __str__(self):
-#         return f"Review by {self.reviewer.username} for {self.worker.user.username}"
 
 # class Message(models.Model):
 #     sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sender')

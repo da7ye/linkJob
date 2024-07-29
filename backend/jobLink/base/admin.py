@@ -2,7 +2,8 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.translation import gettext_lazy as _
 from .forms import CustomUserChangeForm, CustomUserCreationForm
-from .models import User
+from .models import User, Category, Worker, Review, ExtraImage, Language, Education, Certificate
+
 
 # Register your models here.
 
@@ -49,3 +50,10 @@ class UserAdmin(BaseUserAdmin):
 
 
 admin.site.register(User, UserAdmin)
+admin.site.register(Category)
+admin.site.register(Worker)
+admin.site.register(Review)
+admin.site.register(ExtraImage)
+admin.site.register(Language)
+admin.site.register(Education)
+admin.site.register(Certificate)

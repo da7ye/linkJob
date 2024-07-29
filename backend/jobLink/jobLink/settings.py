@@ -21,21 +21,20 @@ env = environ.Env(DEBUG=(bool, False))
 BASE_DIR = Path(__file__).resolve().parent.parent
 environ.Env.read_env(BASE_DIR / '.env')
 
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
-
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env('DEBUG')
 
 ALLOWED_HOSTS = []
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_CREDENTIALS = True #yeeeeeeeeeeeeessssss
 
-CORS_ALOWED_ORIGINS = [
-    'http://localhost:3000/',
-    'http://127.0.0.1:3000/',
-]
+
+# CORS_ALOWED_ORIGINS = [
+#     'http://localhost:3000/',
+#     'http://127.0.0.1:3000/',
+# ]
 
 # Application definition
 
@@ -48,9 +47,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # External Apps:
     'rest_framework',
+    'rest_framework.authtoken',
+
     'corsheaders',
     'djoser',
-    'rest_framework_simple_jwt',
+    'rest_framework_simplejwt',
 
     # internal Apps:
     'base',
@@ -133,21 +134,21 @@ USE_I18N = True
 
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.0/howto/static-files/
-
 STATIC_URL = 'static/'
 
-# Default primary key field type
-# https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
+MEDIA_URL = '/images/'
+
+STATICfILES_DIRS = [
+    BASE_DIR / 'static'
+]
+
+MEDIA_ROOT = 'static/images'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.TokenAuthentication',
-        (...)
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
 }
 
@@ -176,8 +177,19 @@ DJOSER = {
     'ACTIVATION_URL': 'activate/{uid}/{token}',
     'SEND_ACTIVATION_EMAIL': True,
     'SERIALIZERS': {
-        'user_create': 'users.serializers.CreateUserSerializer',
-        'user': "users.serializers.CreateUserSerializer",
-        'user_delete': "djoser.serializers.UserDeleteSerializer",      
-    },
+        'user_create': 'base.serializers.CreateUserSerializer',
+        'user': 'base.serializers.CustomUserSerializer',
+        'current_user': 'base.serializers.CustomUserSerializer',
+        'user_delete': 'djoser.serializers.UserDeleteSerializer',
+    },  
 }
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = env("EMAIL_HOST")
+EMAIL_USE_TLS = True
+EMAIL_PORT = env("EMAIL_PORT")
+EMAIL_HOST_USER = env("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")
+DEFAULT_FROM_EMAIL = "info@jobLink.com"
+DOMAIN = env("DOMAIN")
+SITE_NAME = "jobLink"
