@@ -2,6 +2,10 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser, PermissionsMixin
 from django.utils.translation import gettext_lazy as _
 from .managers import CustomUserManager
+from phonenumber_field.modelfields import PhoneNumberField
+from django.core.exceptions import ValidationError
+
+
 
 class User(AbstractUser, PermissionsMixin):
     username = None
@@ -46,10 +50,15 @@ class Worker(models.Model):
     ]
     gender = models.CharField(max_length=1, choices=gender_choices)
     profile_photo = models.ImageField(upload_to='profile_photos/', null=True, blank=True)
-    num_tel = models.CharField(max_length=20)
+    cover_photo = models.ImageField(upload_to='cover_photos/',default = "cover_photos/placeholder.png", null=True, blank=True)
+    # num_tel = models.CharField(max_length=20)
+    num_tel = PhoneNumberField(blank=True)
+
     small_description = models.TextField(null=True, blank=True)
     description = models.TextField(null=True, blank=True)
     _id = models.AutoField(primary_key=True, editable=False)
+    # activate worker
+    is_active = models.BooleanField(default=False)
     def __str__(self):
         return f"{self.user.email} - {self.num_tel}"
 
@@ -60,21 +69,41 @@ class ExtraImage(models.Model):
     def __str__(self):
         return f"Image {self.id} for {self.worker.user.email}"
 
+
 class Language(models.Model):
-    name = models.CharField(max_length=50)
+    LANGUAGE_CHOICES = [
+        ('arabe', 'العربية'),
+        ('francais', 'Français'),
+        ('english', 'English'),
+    ]
+
+    name = models.CharField(max_length=50, choices=LANGUAGE_CHOICES)
     worker = models.ForeignKey(Worker, related_name='languages', on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.name
+        return self.get_name_display()
+
 
 class Education(models.Model):
     title = models.CharField(max_length=255)
     institution = models.CharField(max_length=255)
-    year_completed = models.IntegerField()
+    date_started = models.DateTimeField()
+    date_ended = models.DateTimeField()
     worker = models.ForeignKey(Worker, related_name='educations', on_delete=models.CASCADE)
 
     def __str__(self):
         return self.title
+
+    def clean(self):
+        super().clean()  # Call the base class's clean method
+        if self.date_started and self.date_ended:
+            if self.date_started >= self.date_ended:
+                raise ValidationError('Start date must be before end date.')
+
+    def save(self, *args, **kwargs):
+        self.clean()  # Ensure validation occurs before saving
+        super().save(*args, **kwargs)
+
 
 class Certificate(models.Model):
     title = models.CharField(max_length=255)
@@ -84,12 +113,15 @@ class Certificate(models.Model):
 
     def __str__(self):
         return self.title
-    
+
+        
 
 class Review(models.Model):
     reviewer = models.ForeignKey(User, on_delete=models.SET_NULL,null=True, related_name='reviewer')
     worker = models.ForeignKey(Worker, on_delete=models.CASCADE)
     # job = models.ForeignKey(Job, on_delete=models.CASCADE)
+    name = models.CharField(max_length=200,null=True,blank=True)
+
     rating =  models.IntegerField(null=True,blank=True,default=0)
     comment = models.TextField(null=True,blank=True)
     createdAt = models.DateTimeField(auto_now_add=True)
@@ -101,23 +133,6 @@ class Review(models.Model):
         return str(self.rating)
 
 
-# class Review(models.Model):
-#     # product = models.ForeignKey(Product,on_delete=models.SET_NULL,null=True)
-#     # user = models.ForeignKey(User,on_delete=models.SET_NULL,null=True)
-#     # name = models.CharField(max_length=200,null=True,blank=True)
-#     # rating =  models.IntegerField(null=True,blank=True,default=0)
-#     # comment = models.TextField(null=True,blank=True)
-#     # createdAt = models.DateTimeField(auto_now_add=True)
-#     # _id =  models.AutoField(primary_key=True,editable=False)
-
-#     def __str__(self):
-#         return str(self.rating)
-# class EmployerProfile(models.Model):
-#     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
-#     company_name = models.CharField(max_length=255)
-
-#     def __str__(self):
-#         return self.user.username
 
 # class Job(models.Model):
 #     employer = models.ForeignKey(EmployerProfile, on_delete=models.CASCADE)

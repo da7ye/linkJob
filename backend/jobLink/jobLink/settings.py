@@ -13,6 +13,7 @@ from datetime import timedelta
 from pathlib import Path
 import environ
 
+from django.templatetags.static import static
 
 
 env = environ.Env(DEBUG=(bool, False))
@@ -26,25 +27,37 @@ SECRET_KEY = env('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env('DEBUG')
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '192.168.100.117','192.168.100.29','192.168.1.113']
+
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True #yeeeeeeeeeeeeessssss
 
 
 # CORS_ALOWED_ORIGINS = [
 #     'http://localhost:3000/',
+#     'http://192.168.100.29:3000/',
 #     'http://127.0.0.1:3000/',
 # ]
 
 # Application definition
 
 INSTALLED_APPS = [
+    'unfold',
+    'unfold.contrib.forms', 
+    'unfold.contrib.import_export',  # optional, if django-import-export package is used
+
+    'django_admin_tailwind',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+# # # maw mhim 3geb
+    'tailwind',
+#     'theme',
+#     'django_browser_reload',
     # External Apps:
     'rest_framework',
     'rest_framework.authtoken',
@@ -53,8 +66,13 @@ INSTALLED_APPS = [
     'djoser',
     'rest_framework_simplejwt',
 
+    'import_export',
+
     # internal Apps:
     'base',
+    
+    "phonenumber_field",
+
 ]
 
 MIDDLEWARE = [
@@ -63,6 +81,7 @@ MIDDLEWARE = [
 
     'corsheaders.middleware.CorsMiddleware',
 
+    "django_browser_reload.middleware.BrowserReloadMiddleware",
 
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -76,7 +95,9 @@ ROOT_URLCONF = 'jobLink.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            'base.theme',
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -90,7 +111,9 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'jobLink.wsgi.application'
-
+# TAILWIND_APP_NAME = 'theme' # This is the name of the app that will be used to generate the tailwind files
+# INTERNAL_IPS = ['127.0.0.1']
+# NPM_BIN_PATH ='C:/Program Files/nodejs/npm.cmd'
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
@@ -122,7 +145,24 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+UNFOLD = {
+    "SITE_TITLE": ' ',
+    "SITE_HEADER": 'linkJob',
+    "SIDEBAR": {
+        "show_search": True,  # Search in applications and models names
+        "show_all_applications": True,  # Dropdown with all applications and models
 
+    }
+    # "SITE_ICON": {
+    #     "light": lambda request: static("icon-light.svg"),  # light mode
+    #     "dark": lambda request: static("icon-dark.svg"),  # dark mode
+    # },
+    #  "SITE_LOGO": {
+    #     "light": lambda request: static("logo-light.svg"),  # light mode
+    #     "dark": lambda request: static("logo-dark.svg"),  # dark mode
+    # },
+
+}
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
