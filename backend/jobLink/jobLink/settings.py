@@ -27,7 +27,7 @@ SECRET_KEY = env('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env('DEBUG')
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '192.168.100.117','192.168.100.29','192.168.1.113']
+ALLOWED_HOSTS = ['127.0.0.1','.vercel.app', 'localhost', '192.168.100.117','192.168.100.29','192.168.1.113']
 
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True #yeeeeeeeeeeeeessssss
