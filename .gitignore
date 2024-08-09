@@ -131,3 +131,4 @@ packages/react-devtools-timeline/dist
 
 # Ensure the frontend directory is included
 !frontend/
+!frontend/**/*
