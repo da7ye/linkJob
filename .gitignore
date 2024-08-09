@@ -130,5 +130,5 @@ packages/react-devtools-shell/dist
 packages/react-devtools-timeline/dist
 
 # Ensure the frontend directory is included
-!frontend/
-!frontend/**/*
+!frontend/linkjob
+!frontend/linkjob/**/*
