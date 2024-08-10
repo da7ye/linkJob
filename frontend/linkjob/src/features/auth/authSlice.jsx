@@ -123,11 +123,10 @@ const authSlice = createSlice({
                 state.isError = true;
                 state.message = action.payload;
                 state.user = null;
-                localStorage.removeItem("user"); // Clear stale token
+                localStorage.removeItem("user"); // Clear stale token!
             });
     },
 });
 
 export const { reset } = authSlice.actions;
 export default authSlice.reducer;
-        
