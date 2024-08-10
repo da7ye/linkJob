@@ -9,7 +9,7 @@ import Contactus from '../components/Contactus'
 function HomeScreen() {
   return (
     <div>
-      Home Screen
+      Home Screend
       <Hero />
       <Postjob />
       <Contactus />
