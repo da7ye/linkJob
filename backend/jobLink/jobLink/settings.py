@@ -5,7 +5,7 @@ import environ
 
 from django.templatetags.static import static
 # from dotenv import load_dotenv
-
+import os
 
 # load_dotenv()  # Load environment variables from a .env file if you're using one
 
@@ -22,11 +22,13 @@ SECRET_KEY = 'django-insecure-+g6$j!i9b5)88sndq&!rbu_fkfeb8@i8t1&#20@6!e+pzyce^7
 # DEBUG = env('DEBUG')
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1','.vercel.app', 'localhost', '192.168.100.117','192.168.100.29','192.168.1.113']
-
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost','da7ye.pythonanywhere.com', '192.168.100.117','192.168.100.29','192.168.1.113']
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True #yeeeeeeeeeeeeessssss
 
+
+STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 # CORS_ALOWED_ORIGINS = [
 #     'http://localhost:3000/',
@@ -169,13 +171,14 @@ USE_I18N = True
 
 USE_TZ = True
 
-STATIC_URL = 'static/'
+# STATIC_URL = 'static/'
+
 
 MEDIA_URL = '/images/'
 
-STATICfILES_DIRS = [
-    BASE_DIR / 'static'
-]
+# STATICFILES_DIRS = [
+#     BASE_DIR / 'static'
+# ]
 
 MEDIA_ROOT = 'static/images'
 
