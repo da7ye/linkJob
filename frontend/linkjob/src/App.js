@@ -25,7 +25,7 @@ import ProfilePage from './screens/profile/ProfilePage';
 import ProviderSignUp from './screens/provider/ProviderSignUp';
 import ProviderProfileUpdate from './screens/profile/ProfileUpdatePage';
 
-// test
+
 function App() {
   return (
     <div>
