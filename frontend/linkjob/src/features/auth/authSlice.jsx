@@ -20,9 +20,8 @@ const handleThunk = async (thunkAPI, serviceFunc, ...params) => {
         return thunkAPI.rejectWithValue(message);
     }
 };
-
 export const register = createAsyncThunk("auth/register", (userData, thunkAPI) => handleThunk(thunkAPI, authService.register, userData));
-export const login = createAsyncThunk("auth/login", (userData, thunkAPI) => handleThunk(thunkAPI, authService.login, userData));
+export const login = createAsyncThunk("auth/login", (userData, thunkAPI) => handleThunk(thunkAPI, authService.login, userData)); // Make sure this is included
 export const logout = createAsyncThunk("auth/logout", async () => authService.logout());
 export const activate = createAsyncThunk("auth/activate", (userData, thunkAPI) => handleThunk(thunkAPI, authService.activate, userData));
 export const resetPassword = createAsyncThunk("auth/resetPassword", (userData, thunkAPI) => handleThunk(thunkAPI, authService.resetPassword, userData));
@@ -118,15 +117,10 @@ const authSlice = createSlice({
             })
             .addCase(getUserInfo.fulfilled, (state, action) => {
                 state.userInfo = action.payload;
-            })
-            .addCase(getUserInfo.rejected, (state, action) => {
-                state.isError = true;
-                state.message = action.payload;
-                state.user = null;
-                localStorage.removeItem("user"); // Clear stale token!
             });
     },
 });
 
 export const { reset } = authSlice.actions;
 export default authSlice.reducer;
+    
