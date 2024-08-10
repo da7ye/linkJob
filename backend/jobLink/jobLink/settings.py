@@ -4,10 +4,10 @@ from pathlib import Path
 import environ
 
 from django.templatetags.static import static
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 
 
-load_dotenv()  # Load environment variables from a .env file if you're using one
+# load_dotenv()  # Load environment variables from a .env file if you're using one
 
 env = environ.Env(DEBUG=(bool, False))
 
@@ -16,9 +16,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 environ.Env.read_env(BASE_DIR / '.env')
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = env('SECRET_KEY')
+# SECRET_KEY = env('SECRET_KEY')
+SECRET_KEY = 'django-insecure-+g6$j!i9b5)88sndq&!rbu_fkfeb8@i8t1&#20@6!e+pzyce^7'
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env('DEBUG')
+# DEBUG = env('DEBUG')
+DEBUG = True
 
 ALLOWED_HOSTS = ['127.0.0.1','.vercel.app', 'localhost', '192.168.100.117','192.168.100.29','192.168.1.113']
 
@@ -191,7 +193,8 @@ SIMPLE_JWT = {
         "JWT"),
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=120),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=60),
-    "SIGNING_KEY": env("SIGNING_KEY"),
+    # "SIGNING_KEY": env("SIGNING_KEY"),
+    "SIGNING_KEY": "xGJlEF4PbAIMti0ubQxcAoLr2mCab2ll",
     "AUTH_HEADER_NAME": "HTTP_AUTHORIZATION",
     "AUTH_TOKEN_CLASSES": ("rest_framework_simplejwt.tokens.AccessToken",),
 }
@@ -218,11 +221,18 @@ DJOSER = {
 }
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = env("EMAIL_HOST")
+# EMAIL_HOST = env("EMAIL_HOST")
+EMAIL_HOST = "sandbox.smtp.mailtrap.io"
 EMAIL_USE_TLS = True
-EMAIL_PORT = env("EMAIL_PORT")
-EMAIL_HOST_USER = env("EMAIL_HOST_USER")
-EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")
+# EMAIL_PORT = env("EMAIL_PORT")
+EMAIL_PORT = "2525"
+# EMAIL_HOST_USER = env("EMAIL_HOST_USER")
+EMAIL_HOST_USER = "sandbox.smtp.mailtrap.io"
+# EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")
+EMAIL_HOST_PASSWORD = "1a139e3f4d751f"
+
 DEFAULT_FROM_EMAIL = "info@jobLink.com"
-DOMAIN = env("DOMAIN")
+# DOMAIN = env("DOMAIN")
+DOMAIN = "localhost:3000"
+
 SITE_NAME = "jobLink"

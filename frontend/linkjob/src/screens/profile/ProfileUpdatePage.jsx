@@ -13,13 +13,13 @@ const WorkerProfileUpdate = () => {
     num_tel: '',
     small_description: '',
     description: '',
-    extra_images: [] // Add extra_images to the formData state
+    extra_images: [] 
   });
 
   const [searchTerm, setSearchTerm] = useState('');
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
 
-  const dispatch = useDispatch();
+  const dispatch = useDispatch(); 
   const categoriesList = useSelector((state) => state.categoriesList);
   const { loading: categoriesLoading, error: categoriesError, categories = [] } = categoriesList;
   const workerProfileDetails = useSelector((state) => state.workerProfileDetails);
