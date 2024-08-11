@@ -17,7 +17,7 @@ export const getWorkerProfile = () => async (dispatch) => {
     
     const { data } = await axios.get(
       // "http://localhost:8000/api/worker-update/",
-      "http://da7ye.pythonanywhere.com/api/worker-update/",
+      "https://da7ye.pythonanywhere.com/api/worker-update/",
       // "http://192.168.1.113:8000/api/worker-update/", // for phone testing
       {
         headers: {

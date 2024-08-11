@@ -14,7 +14,7 @@ import {
     try {
       dispatch({ type: WORKER_DETAIL_REQUEST });
       // const { data } = await axios.get(`http://127.0.0.1:8000/api/workers/${workerName}`); 
-      const { data } = await axios.get(`http://da7ye.pythonanywhere.com/api/workers/${workerName}`);  //after deployement
+      const { data } = await axios.get(`https://da7ye.pythonanywhere.com/api/workers/${workerName}`);  //after deployement
       // const { data } = await axios.get(`http://192.168.1.113:8000/api/workers/${workerName}`); //for phone testing!
 
   
@@ -59,7 +59,7 @@ export const createWorkerReview = (workerId, review) => async (dispatch, getStat
     // Making API call to create worker review
     const { data } = await axios.post(
       // `http://127.0.0.1:8000/api/${workerId}/reviews/`,
-      `http://da7ye.pythonanywhere.com/api/${workerId}/reviews/`, //after deployement
+      `https://da7ye.pythonanywhere.com/api/${workerId}/reviews/`, //after deployement
       // `http://192.168.1.113:8000/api/${workerId}/reviews/`, // for phone testing purposes
       review,
       config
