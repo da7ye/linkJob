@@ -66,9 +66,9 @@ function Navbar() {
           Home
         </li>
       </LinkContainer>
-      <LinkContainer to={`/about`}>
+      <LinkContainer to={`/postedjobs`}>
         <li className="p-4" onClick={() => setNav(false)}>
-          About
+          Posted Jobs 
         </li>
       </LinkContainer>
       {!userInfo?.worker && (

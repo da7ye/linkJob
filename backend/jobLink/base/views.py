@@ -3,10 +3,12 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
-from .models import Category, Review, Worker
-from .serializers import CategorySerializer, CreateWorkerSerializer, ProvidersSerializer, CustomUserSerializer, UpdateWorkerSerializer
+from .models import Category, Job, JobComment, Review, Worker
+from .serializers import CategorySerializer, CreateWorkerSerializer, JobCommentSerializer, JobSerializer, ProvidersSerializer, CustomUserSerializer, UpdateWorkerSerializer
 from rest_framework import status
 from rest_framework.views import APIView
+from rest_framework.exceptions import ValidationError
+
 
 
 @api_view(['GET'])
@@ -14,6 +16,7 @@ def getRoutes(request):
     routes = [
         'GET /api',
         'GET /api/categories',
+        'GET /api/jobs',
         'GET /api/categoryProviders/:id',
         'GET /api/workers',
         'GET /api/workers/:id',
@@ -21,14 +24,7 @@ def getRoutes(request):
     ]
     return Response(routes)
 
-# @api_view(['GET'])
-# def check_if_worker(request):
-#     user = request.user
-#     try:
-#         Worker.objects.get(user=user)
-#         return Response({'is_worker': True}, status=status.HTTP_200_OK)
-#     except Worker.DoesNotExist:
-#         return Response({'is_worker': False}, status=status.HTTP_200_OK)
+
 
 class BecomeWorkerView(APIView):
     permission_classes = [IsAuthenticated]
@@ -81,6 +77,125 @@ def getCategories(request):
     categories = Category.objects.all()
     serializer = CategorySerializer(categories, many=True)
     return Response(serializer.data)
+
+@api_view(['GET'])
+def getJobs(request):
+    jobs = Job.objects.all()
+    serializer = JobSerializer(jobs, many=True)
+    return Response(serializer.data)
+
+@api_view(['GET'])
+def getJobDetails(request, pk):
+    job = Job.objects.get(id=pk)
+    Job_data = JobSerializer(job).data
+
+    return Response(Job_data)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def createJob(request):
+    serializer = JobSerializer(data=request.data, context={'request': request})
+
+    try:
+        if serializer.is_valid(raise_exception=True):
+            serializer.save(employer=request.user)  # Pass the employer explicitly
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+    except ValidationError as e:
+        # Log the validation errors for debugging
+        print("Validation Errors:", e.detail)
+
+        error_messages = {}
+
+        # Build a more descriptive error response
+        for field, messages in e.detail.items():
+            if isinstance(messages, list):
+                error_messages[field] = messages
+            else:
+                error_messages[field] = [messages]
+
+        # Return the errors in a detailed format
+        return Response({
+            "detail": "Validation failed.",
+            "errors": error_messages  # Ensure errors are returned here
+        }, status=status.HTTP_400_BAD_REQUEST)
+    
+# comment on a job:
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def createJobComment(request, pk):
+    try:
+        # Check if the user has a worker model
+        worker = request.user.worker
+    except AttributeError:
+        content = {'detail': 'Only a Worker Can Comment!'}
+        return Response(content, status=status.HTTP_400_BAD_REQUEST)
+
+    job = Job.objects.get(id=pk)
+    data = request.data
+
+    # 1. Check if the user is trying to comment on them self themselves
+    if job.employer == worker:
+        content = {'detail': 'You cannot comment on yourself'}
+        return Response(content, status=status.HTTP_400_BAD_REQUEST)
+
+    # 2. Check if a comment already exists
+    alreadyExists = JobComment.objects.filter(commentator=worker, job=job).exists()
+
+    if alreadyExists:
+        content = {'detail': 'Worker already commented'}
+        return Response(content, status=status.HTTP_400_BAD_REQUEST)
+
+    # 3. Create comment:
+    comment = JobComment.objects.create(
+        commentator=worker,
+        job=job,
+        name=worker.user.first_name,
+        comment=data['comment'],
+    )
+    # Serialize the comment and return it in the response
+    serializer = JobCommentSerializer(comment)
+    return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+# @api_view(['PUT'])
+# @permission_classes([IsAuthenticated])
+# def updateJobComment(request, pk, comment_id):
+#     try:
+#         comment = JobComment.objects.get(id=comment_id)
+#     except JobComment.DoesNotExist:
+#         return Response({'detail': 'Comment not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+#     # Ensure the user is the owner of the comment
+#     if comment.commentator != request.user.worker:
+#         return Response({'detail': 'You do not have permission to edit this comment'}, status=status.HTTP_403_FORBIDDEN)
+
+#     # Update comment content
+#     data = request.data
+#     serializer = JobCommentSerializer(comment, data=data, partial=True)
+
+#     if serializer.is_valid():
+#         serializer.save()
+#         return Response(serializer.data, status=status.HTTP_200_OK)
+#     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def getJobComments(request, pk):
+    job = Job.objects.get(id=pk)
+    comments = JobComment.objects.filter(job=job)
+    serializer = JobCommentSerializer(comments, many=True)
+    return Response(serializer.data)
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def deleteJobComment(request, pk):
+    worker = request.user.worker
+    try:
+        comment = JobComment.objects.get(_id=pk, commentator=worker)
+        comment.delete()
+        return Response({'detail': 'Comment deleted successfully'}, status=status.HTTP_200_OK)
+    except JobComment.DoesNotExist:
+        return Response({'detail': 'Comment not found or unauthorized'}, status=status.HTTP_404_NOT_FOUND)
+
+
 
 
 @api_view(['GET'])

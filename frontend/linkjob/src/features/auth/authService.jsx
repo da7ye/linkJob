@@ -1,10 +1,8 @@
 import axios from "axios"
 
-// const BACKEND_DOMAIN = "http://localhost:8000"
-const BACKEND_DOMAIN = "https://da7ye.pythonanywhere.com" // after deployment
-
-
-// const BACKEND_DOMAIN = "http://192.168.1.113:8000" //for phone testing purposes
+const BACKEND_DOMAIN = "http://localhost:8000"
+// const BACKEND_DOMAIN = "https://da7ye.pythonanywhere.com" // after deployment
+// const BACKEND_DOMAIN = "http://192.168.1.250:8000" //for phone testing purposes
 
 
 const REGISTER_URL = `${BACKEND_DOMAIN}/api/v1/auth/users/`

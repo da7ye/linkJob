@@ -2,33 +2,32 @@ from django.contrib import admin
 from django.utils.html import format_html
 
 from base.forms import CustomUserChangeForm, CustomUserCreationForm
-from .models import Category, User, Worker, Review, ExtraImage, Language, Education, Certificate
+from .models import Category, JobComment, User, Worker, Review, JobExtraImage, WorkerExtraImage, Language, Education, Certificate, Job
 from import_export.admin import ImportExportModelAdmin
 from unfold.admin import ModelAdmin
 from unfold.contrib.import_export.forms import ExportForm, ImportForm
 from django.utils.translation import gettext_lazy as _
 
 
-class UserAdmin(ModelAdmin, ImportExportModelAdmin):
-    import_form_class = ImportForm
-    export_form_class = ExportForm
-    ordering = ["email"]
+
+class UserAdmin(admin.ModelAdmin):
     add_form = CustomUserCreationForm
     form = CustomUserChangeForm
     model = User
-    list_display = ["icon","email", "first_name", "last_name", "is_staff", "is_active"]
+    ordering = ["email"]
+    list_display = ["icon", "email", "first_name", "last_name", "is_staff", "is_active"]
     list_display_links = ["email"]
     list_filter = ["email", "first_name", "last_name", "is_staff", "is_active"]
     search_fields = ["email", "first_name", "last_name"]
 
     def icon(self, obj):
-        return format_html('<span class="material-symbols-outlined">person</span>') 
-    
+        return format_html('<span class="material-symbols-outlined">person</span>')
+
     fieldsets = (
         (
             _("Login Credentials"), {
                 "fields": ("email", "password",)
-            }, 
+            },
         ),
         (
             _("Personal Information"),
@@ -45,25 +44,33 @@ class UserAdmin(ModelAdmin, ImportExportModelAdmin):
         (
             _("Important Dates"),
             {
-                "fields": ("last_login",)
+                "fields": ("last_login",)  # Removed 'date_joined'
             },
         ),
     )
+
     add_fieldsets = (
-            (None, {
-                "classes": ("wide",),
-                "fields": ("email", "first_name", "last_name", "password1", "password2", "is_staff", "is_active"),
-            },),
-        )
+        (None, {
+            "classes": ("wide",),
+            "fields": ("email", "first_name", "last_name", "password1", "password2", "is_staff", "is_active"),
+        }),
+    )
 class CategoryAdmin(ModelAdmin, ImportExportModelAdmin):
     list_display = ["icon", "title", "description", "date_posted"]
     search_fields = ["title", "description"]
     
     def icon(self, obj):
         return format_html('<span class="material-icons">category</span>')
+    
+class JobAdmin(ModelAdmin, ImportExportModelAdmin):
+    list_display = ["employer", "title", "description","more_details","location","payment_expected", "date_posted"]
+    search_fields = ["title", "description"]
+
+    def icon(self, obj):
+        return format_html('<span class="material-icons">job</span>')
 
 class WorkerAdmin(ModelAdmin, ImportExportModelAdmin):
-    list_display = ["icon", "user", "rating", "numReviews", "pricePerHour", "gender", "num_tel"]
+    list_display = ["icon", "user", "rating", "numReviews", "price", "gender", "num_tel"]
     list_filter = ["categories", "gender"]
     search_fields = ["user__email", "num_tel", "small_description", "description"]
 
@@ -77,12 +84,30 @@ class ReviewAdmin(ModelAdmin, ImportExportModelAdmin):
 
     def icon(self, obj):
         return format_html('<span class="material-icons">rate_review</span>')
+    
+class JobCommentAdmin(ModelAdmin, ImportExportModelAdmin):
+    list_display = ["icon", "commentator", "job", "comment", "createdAt"]
+    list_filter = ["job"]
+    search_fields = ["commentator__email", "comment"]
 
-class ExtraImageAdmin(ModelAdmin, ImportExportModelAdmin):
+    def icon(self, obj):
+        return format_html('<span class="material-icons">job</span>')
+
+class WorkerExtraImageAdmin(ModelAdmin, ImportExportModelAdmin):
     import_form_class = ImportForm
     export_form_class = ExportForm
     list_display = ["icon", "worker", "image"]
     search_fields = ["worker__user__email"]
+
+    def icon(self, obj):
+        return format_html('<span class="material-icons">image</span>')
+
+
+class JobExtraImageAdmin(ModelAdmin, ImportExportModelAdmin):
+    import_form_class = ImportForm
+    export_form_class = ExportForm
+    list_display = ["icon", "job", "image"]
+    search_fields = ["job__user__email"]
 
     def icon(self, obj):
         return format_html('<span class="material-icons">image</span>')
@@ -113,9 +138,13 @@ class CertificateAdmin(ModelAdmin, ImportExportModelAdmin):
 
 admin.site.register(User, UserAdmin )
 admin.site.register(Category, CategoryAdmin)
+admin.site.register(Job, JobAdmin)
+admin.site.register(JobComment, JobCommentAdmin)
+
 admin.site.register(Worker, WorkerAdmin)
 admin.site.register(Review, ReviewAdmin)
-admin.site.register(ExtraImage, ExtraImageAdmin)
+admin.site.register(JobExtraImage, JobExtraImageAdmin)
+admin.site.register(WorkerExtraImage, WorkerExtraImageAdmin)
 admin.site.register(Language, LanguageAdmin)
 admin.site.register(Education, EducationAdmin)
 admin.site.register(Certificate, CertificateAdmin)

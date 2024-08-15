@@ -30,44 +30,59 @@ const ServicesPage = () => {
   );
 
   return (
-    <div className="min-h-screen py-12">
-      <div className="container mx-auto px-6">
-        <h1 className="text-4xl sm:text-5xl font-bold text-center text-gray-800 mb-10">
-          Welcome, {userInfo.first_name} {userInfo.last_name}. Find a Service
+    <div className="min-h-screen ">
+      <div className="container mx-auto px-6 lg:px-12">
+        <h1 className="text-5xl sm:text-6xl font-extrabold text-center text-gray-900 mb-12 tracking-wide">
+          Welcome, {userInfo.first_name} {userInfo.last_name}
+          <span className="block mt-4 text-blue-600">Find a Service</span>
         </h1>
-        <div className="max-w-lg mx-auto mb-8">
-          <input
-            type="text"
-            placeholder="Search for services..."
-            value={searchTerm}
-            onChange={handleSearchChange}
-            className="w-full px-6 py-4 rounded-lg shadow-lg border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
-          />
+        <div className="max-w-2xl mx-auto mb-10">
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Search for services..."
+              value={searchTerm}
+              onChange={handleSearchChange}
+              className="w-full px-6 py-4 rounded-full shadow-xl border-0 focus:outline-none focus:ring-4 focus:ring-blue-500 text-lg bg-white text-gray-700 placeholder-gray-400"
+            />
+            <svg
+              className="w-6 h-6 text-gray-400 absolute right-4 top-1/2 transform -translate-y-1/2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-4.35-4.35M11 17a6 6 0 100-12 6 6 0 000 12z"></path>
+            </svg>
+          </div>
         </div>
         {loading ? (
-          <div className="flex justify-center items-center">
+          <div className="flex justify-center items-center h-64">
             <Loader />
           </div>
         ) : error ? (
-          <h3 className="text-center text-red-500">{error}</h3>
+          <h3 className="text-center text-red-500 text-2xl">{error}</h3>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 lg:gap-10">
             {filteredCategories.map((category) => (
               <div
                 key={category._id}
-                className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 cursor-pointer transform hover:scale-105"
+                className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:scale-105 hover:-translate-y-1"
                 onClick={() => handleCategoryClick(category._id)}
               >
-                <img
-                  src={category.image}
-                  alt={category.title}
-                  className="w-full h-40 sm:h-48 md:h-56 object-cover"
-                />
-                <div className="p-4 sm:p-6">
-                  <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 mb-2">
+                <div className="relative h-48 sm:h-56 md:h-64">
+                  <img
+                    src={category.image}
+                    alt={category.title}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-50"></div>
+                </div>
+                <div className="p-6">
+                  <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
                     {category.title}
                   </h2>
-                  <p className="text-gray-600 text-base sm:text-lg md:text-xl mt-4 mb-2">
+                  <p className="text-gray-600 text-base sm:text-lg leading-relaxed">
                     {category.description}
                   </p>
                 </div>
@@ -78,6 +93,7 @@ const ServicesPage = () => {
       </div>
     </div>
   );
+  
 };
 
 export default ServicesPage;

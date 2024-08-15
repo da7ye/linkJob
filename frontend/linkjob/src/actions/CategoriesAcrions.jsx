@@ -10,9 +10,9 @@ import {
 export const listCategories = () => async (dispatch) => {
   try {
     dispatch({ type: CATEGORY_LIST_REQUEST });
-    // const { data } = await axios.get("http://127.0.0.1:8000/api/categories/");
-    const { data } = await axios.get("https://da7ye.pythonanywhere.com/api/categories/"); //after deployement
-    // const { data } = await axios.get("http://192.168.1.113:8000/api/categories/"); //for phone testing!
+    const { data } = await axios.get("http://127.0.0.1:8000/api/categories/");
+    // const { data } = await axios.get("https://da7ye.pythonanywhere.com/api/categories/"); //after deployement
+    // const { data } = await axios.get("http://192.168.1.250:8000/api/categories/"); //for phone testing!
 
 
     dispatch({

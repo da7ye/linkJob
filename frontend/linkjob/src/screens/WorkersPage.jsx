@@ -21,7 +21,7 @@ const WorkersPage = () => {
   };
 
   const handleWorkerClick = (workerId) => {
-    navigate(`/workers/${categoryName}/${workerId}`);
+    navigate(`/workers/${workerId}`);
   };
 
   const filteredWorkers = workers.filter((worker) =>
@@ -79,7 +79,8 @@ const WorkersPage = () => {
                 </div>
                 <div className="p-6 bg-gray-100">
                   <p className="text-lg font-semibold text-gray-900">
-                    from {worker.pricePerHour}UM / hour
+                    from {worker.price}{worker.payment_type  || "Not Available"}
+
                   </p>
                 </div>
               </div>

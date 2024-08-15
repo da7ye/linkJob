@@ -43,11 +43,19 @@ class Worker(models.Model):
     categories = models.ManyToManyField(Category, related_name='workers')
     rating = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
     numReviews = models.IntegerField(null=True, blank=True, default=0)
-    pricePerHour = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
+    price = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
     gender_choices = [
         ('M', 'Male'),
         ('F', 'Female'),
     ]
+
+    # Payment Type
+    PAYMENT_TYPE_CHOICES = [
+        ('Per Hour', 'Per Hour'),
+        ('Per Mission', 'Per Mission'),
+    ]
+    payment_type = models.CharField(max_length=12, choices=PAYMENT_TYPE_CHOICES, default='PH')
+
     gender = models.CharField(max_length=1, choices=gender_choices)
     profile_photo = models.ImageField(upload_to='profile_photos/', null=True, blank=True)
     cover_photo = models.ImageField(upload_to='cover_photos/',default = "cover_photos/placeholder.png", null=True, blank=True)
@@ -60,9 +68,9 @@ class Worker(models.Model):
     # activate worker
     is_active = models.BooleanField(default=False)
     def __str__(self):
-        return f"{self.user.email} - {self.num_tel}"
+        return f"{self.user.email} - {self.user.first_name} "
 
-class ExtraImage(models.Model):
+class WorkerExtraImage(models.Model):
     image = models.ImageField(upload_to='extra_images/')
     worker = models.ForeignKey(Worker, related_name='extra_images', on_delete=models.CASCADE)
 
@@ -75,6 +83,8 @@ class Language(models.Model):
         ('arabe', 'العربية'),
         ('francais', 'Français'),
         ('english', 'English'),
+        ('polar', 'polar'),
+        ('wolof', 'wolof'),
     ]
 
     name = models.CharField(max_length=50, choices=LANGUAGE_CHOICES)
@@ -134,16 +144,59 @@ class Review(models.Model):
 
 
 
-# class Job(models.Model):
-#     employer = models.ForeignKey(EmployerProfile, on_delete=models.CASCADE)
-#     title = models.CharField(max_length=255)
-#     description = models.TextField()
-#     location = models.CharField(max_length=255)
-#     payment = models.DecimalField(max_digits=10, decimal_places=2)
-#     date_posted = models.DateTimeField(auto_now_add=True)
+class Job(models.Model):
+    employer = models.ForeignKey(User, on_delete=models.CASCADE)
+    title = models.CharField(max_length=255)
+    description = models.TextField()
+    more_details = models.TextField()
+    location = models.CharField(max_length=255)
+    payment_expected = models.DecimalField(max_digits=10, decimal_places=2)
+    categories_interested = models.ManyToManyField(Category)
+
+    num_tel = PhoneNumberField(blank=True)
+    # LANGUAGE_CHOICES 
+    LANGUAGE_CHOICES = [
+        ('arabe', 'العربية'),
+        ('francais', 'Français'),
+        ('english', 'English'),
+        ('polar', 'polar'),
+        ('wolof', 'wolof'),
+    ]
+
+    speaked_luanguages = models.CharField(max_length=50, choices=LANGUAGE_CHOICES)
+    # Payment Type
+    PAYMENT_TYPE_CHOICES = [
+        ('Per Hour', 'Per Hour'),
+        ('Per Mission', 'Per Mission'),
+    ]
+    payment_type = models.CharField(max_length=12, choices=PAYMENT_TYPE_CHOICES, default='PH')
+    tools_needed = models.TextField(null=True,blank=True)
+
+    date_posted = models.DateTimeField(auto_now_add=True)
+
+    # extra_images
     
-#     def __str__(self):
-#         return self.title
+    def __str__(self):
+        return self.title
+    
+class JobExtraImage(models.Model):
+    image = models.ImageField(upload_to='extra_images/')
+    job = models.ForeignKey(Job, related_name='extra_images', on_delete=models.CASCADE, null=True, blank=True)
+
+    def __str__(self):
+        return f"Image {self.id} for {self.job}"
+    
+
+class JobComment(models.Model):
+    commentator = models.ForeignKey(Worker, on_delete=models.SET_NULL,null=True)
+    job = models.ForeignKey(Job, on_delete=models.CASCADE)
+    name = models.CharField(max_length=200,null=True,blank=True)
+    comment = models.TextField(null=True,blank=True)
+    createdAt = models.DateTimeField(auto_now_add=True)
+    _id =  models.AutoField(primary_key=True,editable=False)
+
+    def __str__(self):
+        return str(self.name)
 
 # class Application(models.Model):
 #     job = models.ForeignKey(Job, on_delete=models.CASCADE)
@@ -154,19 +207,4 @@ class Review(models.Model):
 #         return f"Application by {self.worker.user.username} for {self.job.title}"
 
 
-# class Message(models.Model):
-#     sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sender')
-#     receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='receiver')
-#     content = models.TextField()
-#     timestamp = models.DateTimeField(auto_now_add=True)
 
-#     def __str__(self):
-#         return f"Message from {self.sender.username} to {self.receiver.username}"
-
-# class Payment(models.Model):
-#     job = models.OneToOneField(Job, on_delete=models.CASCADE)
-#     amount = models.DecimalField(max_digits=10, decimal_places=2)
-#     date = models.DateTimeField(auto_now_add=True)
-
-#     def __str__(self):
-#         return f"Payment for {self.job.title} of amount {self.amount}"

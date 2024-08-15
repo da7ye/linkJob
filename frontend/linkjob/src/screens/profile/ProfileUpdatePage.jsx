@@ -2,19 +2,28 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { listCategories } from '../../actions/CategoriesAcrions';
 import { getWorkerProfile, updateWorkerProfile } from '../../actions/workerProfileActions';
+import { getUserInfo } from "../../features/auth/authSlice";
+import { useNavigate } from "react-router-dom";
+
+
 
 const WorkerProfileUpdate = () => {
   const [formData, setFormData] = useState({
+    first_name: '',
+    last_name: '',
     categories: [],
-    pricePerHour: '',
+    price: '',
+    payment_type: '',
     gender: '',
     profile_photo: null,
     profile_photo_url: '',
     num_tel: '',
     small_description: '',
     description: '',
-    extra_images: [] 
+    extra_images: []
   });
+
+
 
   const [searchTerm, setSearchTerm] = useState('');
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
@@ -29,6 +38,18 @@ const WorkerProfileUpdate = () => {
 
   const dropdownRef = useRef(null);
 
+  const navigate = useNavigate();
+  const { user } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    if (!user) {
+      // If no user is logged in, redirect to login page
+      navigate("/login");
+    } else {
+      dispatch(getUserInfo());
+    }
+  }, [dispatch, user, navigate]);
+
   useEffect(() => {
     dispatch(listCategories());
     dispatch(getWorkerProfile());
@@ -37,17 +58,21 @@ const WorkerProfileUpdate = () => {
   useEffect(() => {
     if (worker) {
       setFormData({
+        first_name: worker.first_name || '',
+        last_name: worker.last_name || '',
         categories: worker.categories || [],
-        pricePerHour: worker.pricePerHour || '',
+        price: worker.price || '',
+        payment_type: worker.payment_type || '',
         gender: worker.gender || '',
         num_tel: worker.num_tel || '',
         small_description: worker.small_description || '',
         description: worker.description || '',
         profile_photo_url: worker.profile_photo || '',
-        extra_images: worker.extra_images || [] // Set existing extra_images if any
+        extra_images: worker.extra_images || []
       });
     }
   }, [worker]);
+  
 
   
   useEffect(() => {
@@ -110,43 +135,23 @@ const WorkerProfileUpdate = () => {
     }));
   };
 
-  // const handleSubmit = (e) => {
-  //   e.preventDefault();
-
-  //   const formDataToSubmit = new FormData();
-  //   formDataToSubmit.append('num_tel', formData.num_tel);
-  //   formDataToSubmit.append('gender', formData.gender);
-  //   formDataToSubmit.append('pricePerHour', formData.pricePerHour);
-  //   formDataToSubmit.append('profile_photo', formData.profile_photo);
-  //   formDataToSubmit.append('small_description', formData.small_description);
-  //   formDataToSubmit.append('description', formData.description);
-  //   formDataToSubmit.append('rating', formData.rating || '');
-
-  //   formData.categories.forEach(category => formDataToSubmit.append('categories', category));
-
-  //   // formData.extra_images.forEach((image, index) => {
-  //   //   formDataToSubmit.append(`extra_images_${index}`, image); // Append each extra image
-  //   // });
-  //   // Append each extra image to the FormData object with the same field name
-  //   formData.extra_images.forEach((image) => {
-  //     formDataToSubmit.append('extra_images', image);
-  //   });
-
-  //   dispatch(updateWorkerProfile(formDataToSubmit));
-  // };
+  
   const handleSubmit = (e) => {
     e.preventDefault();
   
     const formDataToSubmit = new FormData();
+    formDataToSubmit.append('first_name', formData.first_name);
+    formDataToSubmit.append('last_name', formData.last_name);
     formDataToSubmit.append('num_tel', formData.num_tel);
     formDataToSubmit.append('gender', formData.gender);
-    formDataToSubmit.append('pricePerHour', formData.pricePerHour);
-    if (formData.profile_photo) {  // Only append if a new file is selected
+    formDataToSubmit.append('price', formData.price);
+    formDataToSubmit.append('payment_type', formData.payment_type);
+    if (formData.profile_photo) {
       formDataToSubmit.append('profile_photo', formData.profile_photo);
     }
     formDataToSubmit.append('small_description', formData.small_description);
     formDataToSubmit.append('description', formData.description);
-    formDataToSubmit.append('rating', formData.rating || '');
+    // formDataToSubmit.append('rating', formData.rating || '');
   
     formData.categories.forEach(category => formDataToSubmit.append('categories', category));
   
@@ -156,6 +161,7 @@ const WorkerProfileUpdate = () => {
   
     dispatch(updateWorkerProfile(formDataToSubmit));
   };
+  
   
 
   const toggleDropdown = () => {
@@ -179,6 +185,16 @@ const WorkerProfileUpdate = () => {
             <label htmlFor="num_tel" className="block text-sm font-medium text-gray-700">Phone Number</label>
             <input id="num_tel" name="num_tel" type="text" value={formData.num_tel} onChange={handleChange} required className="appearance-none rounded-md block w-full px-4 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-lg" />
           </div>
+
+          <div>
+  <label htmlFor="first_name" className="block text-sm font-medium text-gray-700">First Name</label>
+  <input id="first_name" name="first_name" type="text" value={formData.first_name} onChange={handleChange} required className="appearance-none rounded-md block w-full px-4 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-lg" />
+</div>
+
+<div>
+  <label htmlFor="last_name" className="block text-sm font-medium text-gray-700">Last Name</label>
+  <input id="last_name" name="last_name" type="text" value={formData.last_name} onChange={handleChange} required className="appearance-none rounded-md block w-full px-4 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-lg" />
+</div>
 
           <div>
             <label htmlFor="profile_photo" className="block text-sm font-medium text-gray-700">Profile Photo</label>
@@ -242,14 +258,19 @@ const WorkerProfileUpdate = () => {
             </div>
           </div>
 
+
           <div>
-            <label htmlFor="rating" className="block text-sm font-medium text-gray-700">Rating</label>
-            <input id="rating" name="rating" type="number" value={formData.rating} onChange={handleChange} min="0" max="5" step="0.01" className="appearance-none rounded-md block w-full px-4 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-lg" />
+            <label htmlFor="price" className="block text-sm font-medium text-gray-700">Price </label>
+            <input id="price" name="price" type="number" value={formData.price} onChange={handleChange} required className="appearance-none rounded-md block w-full px-4 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-lg" />
           </div>
 
           <div>
-            <label htmlFor="pricePerHour" className="block text-sm font-medium text-gray-700">Price Per Hour</label>
-            <input id="pricePerHour" name="pricePerHour" type="number" value={formData.pricePerHour} onChange={handleChange} required className="appearance-none rounded-md block w-full px-4 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-lg" />
+            <label htmlFor="payment_type" className="block text-sm font-medium text-gray-700">payment_type</label>
+            <select id="payment_type" name="payment_type" value={formData.payment_type} onChange={handleChange} required className="appearance-none rounded-md block w-full px-4 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-lg">
+              <option value="">Select payment_type</option>
+              <option value="Per Hour">Per Hour</option>
+              <option value="Per Mission">Per Mission</option>
+            </select>
           </div>
 
           <div>

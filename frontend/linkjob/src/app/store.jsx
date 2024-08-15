@@ -7,6 +7,7 @@ import { categoryWorkersListReducers } from "../reducers/CategoryWorkersReducers
 import workerReducer from '../features/worker/workerSlice';
 import { workerProfileDetailsReducer, workerProfileUpdateReducer } from "../reducers/workerProfileReducers";
 import { workerDetailsReducers, workerReviewCreateReducer } from "../reducers/WorkerReducer";
+import { commentAddReducer, commentDeleteReducer, commentsListReducer, jobCreateReducer, jobDetailsReducer } from "../reducers/jobReducers";
 
 
 
@@ -19,6 +20,12 @@ const rootReducer = combineReducers({
   worker: workerReducer,
   workerDetails : workerDetailsReducers,
   workerReviewCreate: workerReviewCreateReducer,
+
+  jobCreate: jobCreateReducer,
+  jobDetails: jobDetailsReducer,
+  commentsList: commentsListReducer,
+  commentAdd: commentAddReducer,
+  commentDelete: commentDeleteReducer,
 
 });
 

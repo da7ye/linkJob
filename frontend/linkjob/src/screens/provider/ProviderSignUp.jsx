@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { listCategories } from '../../actions/CategoriesAcrions';
 import { useDispatch, useSelector } from 'react-redux';
-import { createWorker, reset } from '../../features/worker/workerSlice';
+import { createWorker } from '../../features/worker/workerSlice';
 
 const ProviderSignUp = () => {
   const [formData, setFormData] = useState({
     categories: [],
-    pricePerHour: '',
+    price: '',
+    payment_type: '',
     gender: '',
     profile_photo: null,
     num_tel: '+222',  // Prepopulate with country code
@@ -21,7 +22,7 @@ const ProviderSignUp = () => {
 
   const dispatch = useDispatch();
   const categoriesList = useSelector((state) => state.categoriesList);
-  const { error, loading, categories } = categoriesList;
+  const {  categories } = categoriesList;
 
   const { workers, isLoading, isError, message } = useSelector((state) => state.worker);
   const currentWorker = workers.length > 0 ? workers[0] : null;
@@ -97,8 +98,11 @@ const ProviderSignUp = () => {
     if (!formData.gender) {
       errors.gender = 'Gender is required.';
     }
-    if (!formData.pricePerHour) {
-      errors.pricePerHour = 'Price per hour is required.';
+    if (!formData.price) {
+      errors.price = 'Work Price is required.';
+    }
+    if (!formData.payment_type) {
+      errors.payment_type = 'payment type is required.';
     }
 
     setFieldErrors(errors);
@@ -121,7 +125,8 @@ const ProviderSignUp = () => {
     const formDataToSubmit = new FormData();
     formDataToSubmit.append('num_tel', formData.num_tel);
     formDataToSubmit.append('gender', formData.gender);
-    formDataToSubmit.append('pricePerHour', formData.pricePerHour);
+    formDataToSubmit.append('price', formData.price);
+    formDataToSubmit.append('payment_type', formData.payment_type);
 
     // Optional fields
     formDataToSubmit.append('profile_photo', formData.profile_photo || '');
@@ -200,19 +205,37 @@ const ProviderSignUp = () => {
             </div>
 
             <div>
-              <label htmlFor="pricePerHour" className="block text-sm font-medium text-gray-700">Price Per Hour</label>
+              <label htmlFor="price" className="block text-sm font-medium text-gray-700">Work Price</label>
               <input 
-                id="pricePerHour" 
-                name="pricePerHour" 
+                id="price" 
+                name="price" 
                 type="number" 
-                value={formData.pricePerHour} 
+                value={formData.price} 
                 onChange={handleChange} 
                 required 
                 className="appearance-none rounded-md block w-full px-4 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-lg" 
-                placeholder="Price Per Hour" 
+                placeholder="Price" 
               />
-              {fieldErrors.pricePerHour && <p className="text-red-500 text-sm mt-2">{fieldErrors.pricePerHour}</p>}
+              {fieldErrors.price && <p className="text-red-500 text-sm mt-2">{fieldErrors.price}</p>}
+
             </div>
+            <div>
+              <label htmlFor="payment_type" className="block text-sm font-medium text-gray-700">payment type</label>
+              <select 
+                id="payment_type" 
+                name="payment_type" 
+                value={formData.payment_type} 
+                onChange={handleChange} 
+                required 
+                className="appearance-none rounded-md block w-full px-4 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-lg"
+              >
+                <option value="">Select payment type</option>
+                <option value="Per Hour">Per Hour</option>
+                <option value="Per Mission">Per Mission</option>
+              </select>
+              {fieldErrors.payment_type && <p className="text-red-500 text-sm mt-2">{fieldErrors.payment_type}</p>}
+            </div>
+
 
             <div>
               <label htmlFor="gender" className="block text-sm font-medium text-gray-700">Gender</label>

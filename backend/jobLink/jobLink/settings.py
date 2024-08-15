@@ -22,7 +22,7 @@ SECRET_KEY = 'django-insecure-+g6$j!i9b5)88sndq&!rbu_fkfeb8@i8t1&#20@6!e+pzyce^7
 # DEBUG = env('DEBUG')
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost','da7ye.pythonanywhere.com', '192.168.100.117','192.168.100.29','192.168.1.113']
+ALLOWED_HOSTS = ['127.0.0.1','192.168.1.250', 'localhost','da7ye.pythonanywhere.com']
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True #yeeeeeeeeeeeeessssss
 

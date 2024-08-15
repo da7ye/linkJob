@@ -20,15 +20,26 @@ const handleThunk = async (thunkAPI, serviceFunc, ...params) => {
         return thunkAPI.rejectWithValue(message);
     }
 };
+
 export const register = createAsyncThunk("auth/register", (userData, thunkAPI) => handleThunk(thunkAPI, authService.register, userData));
 export const login = createAsyncThunk("auth/login", (userData, thunkAPI) => handleThunk(thunkAPI, authService.login, userData)); // Make sure this is included
 export const logout = createAsyncThunk("auth/logout", async () => authService.logout());
 export const activate = createAsyncThunk("auth/activate", (userData, thunkAPI) => handleThunk(thunkAPI, authService.activate, userData));
 export const resetPassword = createAsyncThunk("auth/resetPassword", (userData, thunkAPI) => handleThunk(thunkAPI, authService.resetPassword, userData));
 export const resetPasswordConfirm = createAsyncThunk("auth/resetPasswordConfirm", (userData, thunkAPI) => handleThunk(thunkAPI, authService.resetPasswordConfirm, userData));
-export const getUserInfo = createAsyncThunk("auth/getUserInfo", (_, thunkAPI) => {
+
+export const getUserInfo = createAsyncThunk("auth/getUserInfo", async (_, thunkAPI) => {
     const accessToken = thunkAPI.getState().auth.user?.access;
-    return handleThunk(thunkAPI, authService.getUserInfo, accessToken);
+    try {
+        const response = await authService.getUserInfo(accessToken);
+        return response;
+    } catch (error) {
+        if (error.response && error.response.status === 401) {
+            thunkAPI.dispatch(logout()); // Dispatch logout if the token is expired
+            return thunkAPI.rejectWithValue("Session expired. Please log in again.");
+        }
+        return thunkAPI.rejectWithValue(error.response?.data?.detail || error.message || error.toString());
+    }
 });
 
 const authSlice = createSlice({
@@ -123,4 +134,3 @@ const authSlice = createSlice({
 
 export const { reset } = authSlice.actions;
 export default authSlice.reducer;
-    

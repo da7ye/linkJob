@@ -16,9 +16,9 @@ export const getWorkerProfile = () => async (dispatch) => {
     const token = user?.access;
     
     const { data } = await axios.get(
-      // "http://localhost:8000/api/worker-update/",
-      "https://da7ye.pythonanywhere.com/api/worker-update/",
-      // "http://192.168.1.113:8000/api/worker-update/", // for phone testing
+      "http://localhost:8000/api/worker-update/",
+      // "https://da7ye.pythonanywhere.com/api/worker-update/",
+      // "http://192.168.1.250:8000/api/worker-update/", // for phone testing
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -50,9 +50,9 @@ export const updateWorkerProfile = (formData) => async (dispatch) => {
     // console.log(user);
 
 
-    // await axios.put("http://localhost:8000/api/worker-update/", formData, {
-    await axios.put("http://da7ye.pythonanywhere.com/api/worker-update/", formData, {
-      // await axios.put("http://192.168.1.113:8000/api/worker-update/", formData, {    //for phone testing purposes
+    await axios.put("http://localhost:8000/api/worker-update/", formData, {
+    // await axios.put("https://da7ye.pythonanywhere.com/api/worker-update/", formData, {
+      // await axios.put("http://192.168.1.250:8000/api/worker-update/", formData, {    //for phone testing purposes
       headers: {
         "Content-Type": "multipart/form-data",
         Authorization: `Bearer ${token}`,

@@ -12,14 +12,13 @@ const WorkerProfile = () => {
   // Accessing the state from Redux store
   const workerDetails = useSelector((state) => state.workerDetails);
   const { error, loading, worker } = workerDetails;
-
   const authState = useSelector((state) => state.auth || {});
   const { user } = authState;
 
   // Setting state for rating and comment for the review
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
-  console.log(workerDetails);
+  // console.log(workerDetails);
 
   const workerReviewCreate = useSelector((state) => state.workerReviewCreate);
   const {
@@ -91,7 +90,7 @@ const WorkerProfile = () => {
                       Contact
                     </a>
                     <a
-                      href="#"
+                      href="/"
                       className="bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 px-4 rounded"
                     >
                       Resume
@@ -137,8 +136,9 @@ const WorkerProfile = () => {
                         {worker.gender === "M" ? "Male" : "Female"}
                       </p>
                       <p className="text-gray-700">
-                        <span className="font-semibold">Price per Hour:</span>{" "}
-                        {worker.pricePerHour || "Not Available"}
+                        <span className="font-semibold">Price:</span>{" "}
+                        {worker.price || "Not Available"}
+                        {worker.payment_type  || "Not Available"}
                       </p>
                       <p className="text-gray-700">
                         <span className="font-semibold">

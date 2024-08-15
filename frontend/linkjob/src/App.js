@@ -24,6 +24,9 @@ import NotfoundPage from './screens/auth/NotfoundPage';
 import ProfilePage from './screens/profile/ProfilePage';
 import ProviderSignUp from './screens/provider/ProviderSignUp';
 import ProviderProfileUpdate from './screens/profile/ProfileUpdatePage';
+import PostedJobs from './screens/Job/PostedJobs';
+import JobDetail from './screens/Job/JobDetail';
+import PostAJob from './screens/Job/PostAJob';
 
 
 function App() {
@@ -35,8 +38,12 @@ function App() {
           <Routes>
               <Route path="/" element={<HomeScreen />} />
               <Route path="/services" element={<Services />} />
+              <Route path="/postajob" element={<PostAJob />} />
+
+              <Route path="/postedjobs" element={<PostedJobs />} />
+              <Route path="/postedjobs/:id" element={<JobDetail />} />
               <Route path="/category/:categoryName" element={<WorkersPage />} />
-              <Route path="/workers/:categoryName/:workerName" element={<WorkerProfile />} />
+              <Route path="/workers/:workerName" element={<WorkerProfile />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/signup" element={<SignUp />} />
               <Route path="/providersignup" element={<ProviderSignUp />} />
@@ -45,6 +52,7 @@ function App() {
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/password/reset/confirm/:uid/:token" element={<ResetPassword />} />
               <Route path="/activate/:uid/:token" element={<ActivatePage />} />
+
               <Route path="*" element={<NotfoundPage />} />
 
               {/* Define other routes here */}
