@@ -18,6 +18,8 @@ const PostAJob = () => {
     speaked_luanguages: "english",
     payment_type: "Per Hour",
     tools_needed: "",
+    extra_images: []
+
   });
 
   const [searchTerm, setSearchTerm] = useState('');
@@ -35,13 +37,25 @@ const PostAJob = () => {
     dispatch(listCategories());
   }, [dispatch]);
 
+  // const handleCategoryChange = (e) => {
+  //   const { options } = e.target;
+  //   const selectedCategories = Array.from(options)
+  //     .filter(option => option.selected)
+  //     .map(option => option.value);
+  
+  //   // Ensure categories_interested is an array
+  //   setFormData((prev) => ({
+  //     ...prev,
+  //     categories_interested: selectedCategories,
+  //   }));
+  // };
   const handleCategoryChange = (e) => {
     const { options } = e.target;
     const selectedCategories = Array.from(options)
       .filter(option => option.selected)
       .map(option => option.value);
   
-    // Ensure categories_interested is an array
+    // Ensure categories_interested is an array and not empty
     setFormData((prev) => ({
       ...prev,
       categories_interested: selectedCategories,
@@ -51,46 +65,83 @@ const PostAJob = () => {
   const handleChange = (e) => {
     const { id, value, type, checked, multiple } = e.target;
     if (type === "checkbox") {
-      setFormData((prev) => ({
-        ...prev,
-        [id]: checked,
-      }));
+        setFormData((prev) => ({
+            ...prev,
+            [id]: checked,
+        }));
     } else if (type === "file") {
-      setFormData((prev) => ({
-        ...prev,
-        [id]: e.target.files[0],
-      }));
+        if (multiple) {
+            setFormData((prev) => ({
+                ...prev,
+                [id]: Array.from(e.target.files),  
+            }));
+        } else {
+            setFormData((prev) => ({
+                ...prev,
+                [id]: e.target.files[0],
+            }));
+        }
     } else if (multiple) {
-      setFormData((prev) => ({
-        ...prev,
-        [id]: [...e.target.options].filter(option => option.selected).map(option => option.value),
-      }));
+        setFormData((prev) => ({
+            ...prev,
+            [id]: [...e.target.options].filter(option => option.selected).map(option => option.value),
+        }));
     } else {
-      setFormData((prev) => ({
-        ...prev,
-        [id]: value,
-      }));
+        setFormData((prev) => ({
+            ...prev,
+            [id]: value,
+        }));
     }
-  };
+};
 
-  const handleSubmit = (e) => {
+// const handleSubmit = (e) => {
+//   e.preventDefault();
+
+//   const form = new FormData();
+//   for (const key in formData) {
+//       if (key === 'extra_images') {
+//           formData[key].forEach((file) => {
+//               form.append('extra_images[]', file); // Use [] to indicate multiple files
+//           });
+//       } else if (Array.isArray(formData[key])) {
+//           formData[key].forEach((item) => form.append(`${key}[]`, item));
+//       } else {
+//           form.append(key, formData[key]);
+//       }
+//   }
+
+//   const token = user?.access;
+
+//   dispatch(createJob(form, token));
+// };
+const handleSubmit = (e) => {
   e.preventDefault();
 
   const form = new FormData();
+
+  // Append all form data to FormData object
   for (const key in formData) {
-    if (Array.isArray(formData[key])) {
-      formData[key].forEach((item, index) => form.append(`${key}[]`, item)); // Append arrays as multiple fields
+    if (key === 'extra_images') {
+      formData[key].forEach((file) => {
+        form.append('extra_images', file);
+      });
+    } else if (Array.isArray(formData[key])) {
+      formData[key].forEach((item) => form.append(key, item));
     } else {
       form.append(key, formData[key]);
     }
   }
 
-  const token = user?.access; // Get the access token
+  // Check the content of FormData before submission
+  for (let pair of form.entries()) {
+    console.log(pair[0], pair[1]); // Logs each key-value pair in the form data
+  }
 
-  // Dispatch the createJob action, passing the FormData and token
+  const token = user?.access;
   dispatch(createJob(form, token));
-  console.log("Access Token:", token);
 };
+
+
 
   if (success) {
     navigate("/postedjobs"); // Redirect to the jobs list after successful creation
@@ -191,22 +242,6 @@ const PostAJob = () => {
         </div>
 
         {/* Categories Interested */}
-        {/* <div className="mb-6">
-          <label
-            className="block text-gray-700 text-sm font-bold mb-2"
-            htmlFor="categories_interested"
-          >
-            Categories Interested
-          </label>
-          <input
-            id="categories_interested"
-            type="text"
-            value={formData.categories_interested.join(",")}
-            onChange={(e) => handleChange({ target: { id: 'categories_interested', value: e.target.value.split(",") } })}
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            placeholder="Enter categories separated by commas"
-          />
-        </div> */}
         <div>
               <label htmlFor="categories_interested" className="block text-sm font-medium text-gray-700">Categories Interested</label>
               <input
@@ -299,6 +334,21 @@ const PostAJob = () => {
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           />
         </div>
+        <div className="mb-6">
+    <label
+        className="block text-gray-700 text-sm font-bold mb-2"
+        htmlFor="extra_images"
+    >
+        Extra Images
+    </label>
+    <input
+        id="extra_images"
+        type="file"
+        multiple
+        onChange={handleChange}
+        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+    />
+</div>
 
         <button
           type="submit"

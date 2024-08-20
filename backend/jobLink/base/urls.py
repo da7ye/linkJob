@@ -1,6 +1,6 @@
 from django.urls import path, re_path
 from . import views
-from .views import BecomeWorkerView, WorkerDetailView
+from .views import BecomeWorkerView, WorkerDetailView, deleteUserJob, updateUserJob
 
 
 urlpatterns = [
@@ -8,6 +8,12 @@ urlpatterns = [
     path('categories/', views.getCategories),
     path('jobs/', views.getJobs),
     path('jobs/postajob/', views.createJob),
+    path('userjobs/', views.getUserJobs),
+    path('deletejob/<int:job_id>/', deleteUserJob, name='delete-job'),
+
+    path('updatejob/<int:job_id>/', updateUserJob, name='update-job'),
+
+
     path('jobs/<str:pk>/', views.getJobDetails),
 
     path('categoryProviders/<str:pk>/', views.getCategorieProviders),

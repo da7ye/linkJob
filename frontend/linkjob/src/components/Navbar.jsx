@@ -14,14 +14,14 @@ function Navbar() {
 
   const { user, userInfo } = useSelector((state) => state.auth);
 
-  useEffect(() => {
-    if (!user) {
-      const storedUser = JSON.parse(localStorage.getItem("user"));
-      if (storedUser) {
-        dispatch(login(storedUser));
-      }
-    }
-  }, [user, dispatch]);
+  // useEffect(() => {
+  //   if (!user) {
+  //     const storedUser = JSON.parse(localStorage.getItem("user"));
+  //     if (storedUser) {
+  //       dispatch(login(storedUser));
+  //     }
+  //   }
+  // }, [user, dispatch]);
 
   useEffect(() => {
     if (user) {

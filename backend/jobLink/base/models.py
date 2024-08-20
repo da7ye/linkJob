@@ -180,8 +180,8 @@ class Job(models.Model):
         return self.title
     
 class JobExtraImage(models.Model):
-    image = models.ImageField(upload_to='extra_images/')
-    job = models.ForeignKey(Job, related_name='extra_images', on_delete=models.CASCADE, null=True, blank=True)
+    image = models.ImageField(upload_to='job/extra_images/')
+    job = models.ForeignKey(Job, related_name='job_extra_images', on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
         return f"Image {self.id} for {self.job}"

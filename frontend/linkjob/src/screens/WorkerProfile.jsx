@@ -18,7 +18,6 @@ const WorkerProfile = () => {
   // Setting state for rating and comment for the review
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
-  // console.log(workerDetails);
 
   const workerReviewCreate = useSelector((state) => state.workerReviewCreate);
   const {

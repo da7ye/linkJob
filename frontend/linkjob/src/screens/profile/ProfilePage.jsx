@@ -4,6 +4,8 @@ import { getUserInfo } from "../../features/auth/authSlice";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import Rating from "../../components/Rating";
+import WorkerProfile from "../WorkerProfile";
+import MyPostedJobs from "../Job/MyPostedJobs";
 
 const ProfilePage = () => {
   const dispatch = useDispatch();
@@ -27,6 +29,7 @@ const ProfilePage = () => {
 
 
   return (
+    <>
     <div className="min-h-screen py-8">
       <div className="container mx-auto py-8">
         {/* Status Message */}
@@ -277,7 +280,12 @@ const ProfilePage = () => {
           </div>
         </div>
       </div>
+     {/* Worker Profile Component */}
+     {userInfo && (
+      <MyPostedJobs/>
+    )}
     </div>
+    </>
   );
 };
 

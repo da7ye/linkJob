@@ -27,6 +27,8 @@ import ProviderProfileUpdate from './screens/profile/ProfileUpdatePage';
 import PostedJobs from './screens/Job/PostedJobs';
 import JobDetail from './screens/Job/JobDetail';
 import PostAJob from './screens/Job/PostAJob';
+import MyPostedJobs from './screens/Job/MyPostedJobs';
+import UpdateJob from './screens/Job/JobUpdate';
 
 
 function App() {
@@ -41,6 +43,8 @@ function App() {
               <Route path="/postajob" element={<PostAJob />} />
 
               <Route path="/postedjobs" element={<PostedJobs />} />
+              <Route path="/userjobs" element={<MyPostedJobs />} />
+              <Route path="/updatejob/:job_id" element={<UpdateJob />} />
               <Route path="/postedjobs/:id" element={<JobDetail />} />
               <Route path="/category/:categoryName" element={<WorkersPage />} />
               <Route path="/workers/:workerName" element={<WorkerProfile />} />

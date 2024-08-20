@@ -8,7 +8,7 @@ const JobDetail = () => {
   const { id } = useParams(); 
   const [comment, setComment] = useState('');
   const dispatch = useDispatch();
-  const { userInfo, user } = useSelector((state) => state.auth);
+  const { userInfo, user } = useSelector((state) => state.auth || {});
 
   const accessToken = user?.access;
 
@@ -71,8 +71,8 @@ const JobDetail = () => {
         <div className="p-8 bg-gray-50">
           <h2 className="text-3xl font-bold mb-4 text-gray-800">Extra Images</h2>
           <div className="grid grid-cols-3 gap-4">
-            {job.extra_images && job.extra_images.length > 0 ? (
-              job.extra_images.map((image, index) => (
+            {job.job_extra_images && job.job_extra_images.length > 0 ? (
+              job.job_extra_images.map((image, index) => (
                 <img 
                   key={index} 
                   src={image.image} 
@@ -131,6 +131,7 @@ const JobDetail = () => {
             <p>No comments yet.</p>
           )}
         </div>
+        {user ? (
         <div className="mt-8">
           <textarea
             value={comment}
@@ -149,6 +150,11 @@ const JobDetail = () => {
           {addError && <p className="text-red-500 mt-4">{addError}</p>}
           {deleteError && <p className="text-red-500 mt-4">{deleteError}</p>}
         </div>
+        ) : (
+          <p className="text-center text-red-500">
+            Please log in as a worker to leave a job comment!
+          </p>
+        )}
       </div>
     </div>
   );

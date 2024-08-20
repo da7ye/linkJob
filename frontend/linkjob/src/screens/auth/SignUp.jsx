@@ -71,6 +71,7 @@ const SignupPage = () => {
             Create your account
           </h2>
           {isLoading && <Loader />}
+          {/* <Loader /></div> */}
         </div>
         <form
           className="space-y-8"

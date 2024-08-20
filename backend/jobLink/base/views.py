@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, parser_classes
 from rest_framework.response import Response
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
@@ -8,6 +8,7 @@ from .serializers import CategorySerializer, CreateWorkerSerializer, JobCommentS
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.exceptions import ValidationError
+from rest_framework.parsers import MultiPartParser, FormParser
 
 
 
@@ -84,6 +85,39 @@ def getJobs(request):
     serializer = JobSerializer(jobs, many=True)
     return Response(serializer.data)
 
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def getUserJobs(request):
+    user = request.user
+    jobs = Job.objects.filter(employer=user)
+    serializer = JobSerializer(jobs, many=True)
+    return Response(serializer.data)
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def deleteUserJob(request, job_id):
+    try:
+        job = Job.objects.get(id=job_id, employer=request.user)
+        job.delete()
+        return Response({'message': 'Job deleted successfully!'}, status=status.HTTP_204_NO_CONTENT)
+    except Job.DoesNotExist:
+        return Response({'error': 'Job not found or you are not authorized to delete this job.'}, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def updateUserJob(request, job_id):
+    try:
+        job = Job.objects.get(id=job_id, employer=request.user)
+    except Job.DoesNotExist:
+        return Response({'error': 'Job not found or you are not authorized to update this job.'}, status=status.HTTP_404_NOT_FOUND)
+
+    serializer = JobSerializer(job, data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 @api_view(['GET'])
 def getJobDetails(request, pk):
     job = Job.objects.get(id=pk)
@@ -91,34 +125,29 @@ def getJobDetails(request, pk):
 
     return Response(Job_data)
 
+
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
+@parser_classes([MultiPartParser, FormParser])
 def createJob(request):
     serializer = JobSerializer(data=request.data, context={'request': request})
 
     try:
-        if serializer.is_valid(raise_exception=True):
-            serializer.save(employer=request.user)  # Pass the employer explicitly
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
     except ValidationError as e:
-        # Log the validation errors for debugging
-        print("Validation Errors:", e.detail)
-
-        error_messages = {}
-
-        # Build a more descriptive error response
-        for field, messages in e.detail.items():
-            if isinstance(messages, list):
-                error_messages[field] = messages
-            else:
-                error_messages[field] = [messages]
-
-        # Return the errors in a detailed format
+        error_messages = {
+            field: messages if isinstance(messages, list) else [messages]
+            for field, messages in e.detail.items()
+        }
+        
         return Response({
             "detail": "Validation failed.",
-            "errors": error_messages  # Ensure errors are returned here
+            "errors": error_messages
         }, status=status.HTTP_400_BAD_REQUEST)
-    
+
 # comment on a job:
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -127,8 +156,9 @@ def createJobComment(request, pk):
         # Check if the user has a worker model
         worker = request.user.worker
     except AttributeError:
-        content = {'detail': 'Only a Worker Can Comment!'}
+        content = {'detail': 'Only a Worker Can Comment On the Job!'}
         return Response(content, status=status.HTTP_400_BAD_REQUEST)
+    
 
     job = Job.objects.get(id=pk)
     data = request.data
@@ -144,6 +174,13 @@ def createJobComment(request, pk):
     if alreadyExists:
         content = {'detail': 'Worker already commented'}
         return Response(content, status=status.HTTP_400_BAD_REQUEST)
+
+     
+    # 3. Check if a the commenting worker's account is not activated
+    if worker.is_active == False:
+        content = {'detail': 'Your Worker Account is not activated yet!'}
+        return Response(content, status=status.HTTP_400_BAD_REQUEST)
+
 
     # 3. Create comment:
     comment = JobComment.objects.create(

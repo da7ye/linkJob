@@ -53,7 +53,7 @@ class WorkerExtraImageSerializer(serializers.ModelSerializer):
 class JobExtraImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = JobExtraImage
-        fields = '__all__'
+        fields =  ['image']
 
 class LanguageSerializer(serializers.ModelSerializer):
     class Meta:
@@ -115,42 +115,47 @@ class CategorySerializer(ModelSerializer):
         fields = '__all__'
 
 
-# class JobSerializer(ModelSerializer):
-#     extra_images = JobExtraImageSerializer(many=True, read_only=True)
-
-#     class Meta:
-#         model = Job
-#         fields = '__all__'
-
-
-    
 class JobSerializer(serializers.ModelSerializer):
-    extra_images = JobExtraImageSerializer(many=True, read_only=True)
+    job_extra_images = JobExtraImageSerializer(many=True, read_only=True)
+    # Using serializers.ListField with child=serializers.ImageField() directly on the extra_images 
+    # field ensures that Django's REST framework understands that this field expects a list of 
+    # image files. This matches the structure you're sending from the frontend.
+    extra_images = serializers.ListField(
+        child=serializers.ImageField(), required=False
+    )
 
+    employer = UserSerializer(read_only=True)  
     class Meta:
+
         model = Job
         fields = [
-            'id','title', 'description', 'more_details', 'location',
+            'id', 'title', 'description', 'more_details', 'location',
             'payment_expected', 'categories_interested', 'num_tel',
             'speaked_luanguages', 'payment_type', 'tools_needed', 'extra_images',
-            'date_posted'
+            'date_posted','job_extra_images','employer' 
         ]
 
-        def create(self, validated_data):
-            categories = validated_data.pop('categories_interested', [])
-            employer = self.context['request'].user
-            
-            # Remove employer from validated_data if it exists to avoid conflict
-            if 'employer' in validated_data:
-                validated_data.pop('employer')
-            
-            # Create the job object
-            job = Job.objects.create(employer=employer, **validated_data)
-            
-            # Set the categories after the job is created
-            job.categories_interested.set(categories)
-            
-            return job
+    def create(self, validated_data):
+        # Extract extra_images data from the validated data before creating the job
+        extra_images_data = validated_data.pop('extra_images', [])
+        categories = validated_data.pop('categories_interested', [])
+
+        # Create the job object
+        job = Job.objects.create(
+            # Get the employer from the context
+            employer=self.context['request'].user, 
+            **validated_data
+        )
+        # Set the categories after the job is created
+        job.categories_interested.set(categories)
+
+        # Save the extra images associated with the job
+        for image in extra_images_data:
+            JobExtraImage.objects.create(job=job, image=image)
+
+        return job
+
+
 
 
 class ProvidersSerializer(ModelSerializer):
