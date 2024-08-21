@@ -58,9 +58,9 @@ export const createWorkerReview = (workerId, review) => async (dispatch, getStat
 
     // Making API call to create worker review
     const { data } = await axios.post(
-      // `http://127.0.0.1:8000/api/${workerId}/reviews/`,
+      `http://127.0.0.1:8000/api/${workerId}/reviews/`,
       // `https://da7ye.pythonanywhere.com/api/${workerId}/reviews/`, //after deployement
-      `http://192.168.1.250:8000/api/${workerId}/reviews/`, // for phone testing purposes
+      // `http://192.168.1.250:8000/api/${workerId}/reviews/`, // for phone testing purposes
       review,
       config
     );

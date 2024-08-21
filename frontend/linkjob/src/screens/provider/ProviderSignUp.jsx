@@ -136,11 +136,6 @@ const ProviderSignUp = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (currentWorker) {
-      console.error('You are already a worker.');
-      return;
-    }
-
     if (phoneError || !validateRequiredFields()) {
       console.error('Form validation errors.');
       return;
@@ -267,7 +262,7 @@ const ProviderSignUp = () => {
               )}
             </div>
 
-            {/* Display Selected Categories */}
+            {/* Display Selected Categori.es */}
             <div className="space-y-1">
               <label className="block text-sm font-medium text-gray-700">Selected Categories:</label>
               <div className="flex flex-wrap gap-2">

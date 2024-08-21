@@ -4,18 +4,18 @@ import { useDispatch, useSelector } from "react-redux";
 import { WORKER_CREATE_REVIEW_RESET } from "../constants/WorkerConstants";
 import { listWorkerDetail, createWorkerReview } from "../actions/WokerActions";
 import Rating from "../components/Rating";
+import ImageModal from "../components/WorkerImageModal";
+
 
 const WorkerProfile = () => {
   const dispatch = useDispatch();
   const { workerName } = useParams();
 
-  // Accessing the state from Redux store
   const workerDetails = useSelector((state) => state.workerDetails);
   const { error, loading, worker } = workerDetails;
   const authState = useSelector((state) => state.auth || {});
   const { user } = authState;
 
-  // Setting state for rating and comment for the review
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
 
@@ -26,8 +26,10 @@ const WorkerProfile = () => {
     error: errorWorkerReview,
   } = workerReviewCreate;
 
+  const [selectedImage, setSelectedImage] = useState(null); // State for the selected image
+  const [isModalOpen, setIsModalOpen] = useState(false); // State for modal visibility
+
   useEffect(() => {
-    // Dispatch action to get worker details and user info
     dispatch(listWorkerDetail(workerName));
   }, [dispatch, workerName]);
 
@@ -47,6 +49,16 @@ const WorkerProfile = () => {
     } else {
       dispatch(createWorkerReview(workerName, { rating, comment }));
     }
+  };
+
+  const openImageModal = (imageUrl) => {
+    setSelectedImage(imageUrl);
+    setIsModalOpen(true);
+  };
+
+  const closeImageModal = () => {
+    setIsModalOpen(false);
+    setSelectedImage(null);
   };
 
   return (
@@ -104,7 +116,7 @@ const WorkerProfile = () => {
                   <ul>
                     {worker.categories && worker.categories.length > 0 ? (
                       worker.categories.map((category, index) => (
-                        <li key={index} src={category._id} className="mb-2">
+                        <li key={index} className="mb-2">
                           {category.title}
                         </li>
                       ))
@@ -137,7 +149,7 @@ const WorkerProfile = () => {
                       <p className="text-gray-700">
                         <span className="font-semibold">Price:</span>{" "}
                         {worker.price || "Not Available"}
-                        {worker.payment_type  || "Not Available"}
+                        {worker.payment_type || "Not Available"}
                       </p>
                       <p className="text-gray-700">
                         <span className="font-semibold">
@@ -169,7 +181,8 @@ const WorkerProfile = () => {
                           key={index}
                           src={image.image}
                           alt={`Extra Image ${index + 1}`}
-                          className="w-full h-auto rounded-lg object-cover"
+                          className="w-full h-auto rounded-lg object-cover cursor-pointer transition-transform duration-300 hover:scale-105"
+                          onClick={() => openImageModal(image.image)} // Open modal on image click
                         />
                       ))
                     ) : (
@@ -183,12 +196,11 @@ const WorkerProfile = () => {
                 {/* Educations Section */}
                 <div className="grid grid-cols-1 md:grid-cols-2 mb-8">
                   <div className="gap-4">
-                  <h2 className="text-xl font-bold mb-4">Education</h2>
+                    <h2 className="text-xl font-bold mb-4">Education</h2>
                     {worker.educations && worker.educations.length > 0 ? (
                       worker.educations.map((education, index) => (
                         <div
                           key={index}
-                          // className="w-full h-auto rounded-lg object-cover"
                         >
                           {education.title}
                         </div>
@@ -200,12 +212,11 @@ const WorkerProfile = () => {
 
                   {/* Speaked Languages Section */}
                   <div className="gap-4">
-                  <h2 className="text-xl font-bold mb-4">Speaked Languages</h2>
+                    <h2 className="text-xl font-bold mb-4">Speaked Languages</h2>
                     {worker.languages && worker.languages.length > 0 ? (
                       worker.languages.map((language, index) => (
                         <div
                           key={index}
-                          // className="w-full h-auto rounded-lg object-cover"
                         >
                           {language.name}
                         </div>
@@ -379,6 +390,12 @@ const WorkerProfile = () => {
           </div>
         </div>
       )}
+      {/* Image Modal */}
+      <ImageModal
+        isOpen={isModalOpen}
+        onClose={closeImageModal}
+        imageUrl={selectedImage}
+      />
     </div>
   );
 };
